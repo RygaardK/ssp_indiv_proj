@@ -1,0 +1,353 @@
+const { MongoClient, ObjectID } = require('mongodb');
+
+const url = 'mongodb://localhost:27017';
+const dbName = 'rygaard';
+const collectionName = 'rygaard';
+
+console.log('About to connect to database...');
+
+
+function runQuery(queryFunction) {
+    MongoClient.connect(
+        url,
+        { useUnifiedTopology: true },
+        (error, client) => {
+            if( error ) {
+                console.log('Could not connect to database: ' + error.message);
+                return;
+                // Om man gör detta i en Express route, behöver man skicka ett lämpligt felmeddelande till frontend
+            }
+
+            // Ta fram den collection som query ska köras i
+            const col = client.db(dbName).collection(collectionName);
+            console.log(col);
+            queryFunction(
+                col,
+                () => client.close()
+            )
+        }
+    )
+}
+
+const exampleFind = (col, whenDone) => {
+    col.find({ color: 'black' }).toArray((error, docs) => {// här skall vi välja via FrontEnd
+        try {
+            if( error ) {
+                console.log('Bad find query!', error.message);
+                return;
+            }
+            console.log('Found documents:');
+            docs.forEach(doc => {
+                console.log(`* ${doc.name}, ${doc.color}, ${doc.price} kr`);// här skriva om till vår db
+            })
+        } finally {
+            whenDone();
+        }
+    })
+}
+
+//runQuery(exampleFind)
+
+const exampleInsert = (col, whenDone) => {
+    col.insertMany(
+        [
+            { modelname: 'Båt 1', price: 20, color: 'black' },
+            { name: 'fedora', price: 400, color: 'blond' }
+        ],
+        (error, result) => {
+            try {
+                if( error ) {
+                    console.log('Bad insert query!', error.message);
+                    return;
+                }
+                console.log('Query successful, added hats.');
+                console.log(result);
+            } finally {
+                // client.close();
+                whenDone();
+            }
+        }
+    )
+}
+
+//runQuery(exampleInsert)
+
+const exampleUpdate = (col, whenDone) => {
+    //const filter = { _id: new ObjectID("5d62f9ac559322bc151c056c") };
+    const filter = { name: 'beret' };
+    const update = { $inc: { price: 5 } };
+    col.updateOne(filter, update, (error, result) => {
+        if( error ) {
+            console.log('Could not update that: ', error.message);
+        } else {
+            console.log('Its now updated: ', result.result);
+        }
+        whenDone();
+    })
+}
+//runQuery(exampleUpdate)
+
+
+
+const exampleDelete = (col, whenDone) => {
+    const filter = { _id: new ObjectID("5f4533ae2b1af646b00c402a")}
+    col.deleteOne(filter, (error, result) => {
+        if( error ) {
+            console.log('Could not remove that: ', error.message);
+        } else {
+            console.log('Removed that: ', result.result);
+        }
+        whenDone();
+    })
+}
+runQuery(exampleDelete)
+
+
+
+/*
+function findHats(col, callback) {
+    col.find({}).toArray((error, docs) => {
+        try {
+            if( error ) {
+                console.log('Bad find query!', error.message);
+                return;
+            }
+            console.log('Found documents:');
+            docs.forEach(doc => {
+                console.log('* ' + doc.name);
+            })
+        } finally {
+            callback();
+        }
+    })
+}
+
+
+function insertHats(col, callback) {
+    col.insertMany(
+        [
+            { name: 'beret', price: 20, color: 'black' },
+            { name: 'fedora', price: 400, color: 'blond' }
+        ],
+        (error, result) => {
+            try {
+                if( error ) {
+                    console.log('Bad insert query!', error.message);
+                    return;
+                }
+                console.log('Query successful, added hats.');
+                console.log(result);
+            } finally {
+                // client.close();
+                callback();
+            }
+        }
+    )
+}
+
+
+function updateHat(col, client) {
+    // const filter = { _id: new ObjectID("5d62f9ac559322bc151c056c") };
+    const filter = { name: 'cap' };
+    const update = { $inc: { price: 5 } };
+    col.updateOne(filter, update, (error, result) => {
+        if( error ) {
+            console.log('Could not update hat', error.message);
+        } else {
+            console.log('Hat updated', result.result);
+        }
+        client.close();
+    })
+}
+
+
+function deleteHat(col, client) {
+    const filter = { _id: new ObjectID("5f4507bb4d09a43064bb84fa")}
+    col.deleteOne(filter, (error, result) => {
+        if( error ) {
+            console.log('Could not remove hat', error.message);
+        } else {
+            console.log('Removed hat', result.result);
+        }
+        client.close();
+    })
+}*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+const { MongoClient, ObjectID } = require('mongodb');
+
+const url = 'mongodb://localhost:27017';
+const dbName = 'rygaard';
+const collectionName = 'rygaard';
+
+console.log('About to connect to database...');
+
+
+function runQuery(queryFunction) {
+    MongoClient.connect(
+        url,
+        { useUnifiedTopology: true },
+        (error, client) => {
+            if( error ) {
+                console.log('Could not connect to database: ' + error.message);
+                return;
+                // Om man gör detta i en Express route, behöver man skicka ett lämpligt felmeddelande till frontend
+            }
+
+            // Ta fram den collection som query ska köras i
+            const col = client.db(dbName).collection(collectionName);
+            //console.log(col);
+            queryFunction(
+                col,
+                () => client.close()
+            )
+        }
+    )
+}
+
+const getBoat = (col, whenDone) => {
+    col.find({ color: 'black' }).toArray((error, docs) => {// här skall vi välja via FrontEnd
+        try {
+            if( error ) {
+                console.log('Bad find query!', error.message);
+                return;
+            }
+            console.log('Found documents:');
+            docs.forEach(doc => {
+                console.log(`* ${doc.name}, ${doc.color}, ${doc.price} kr`);// här skriva om till vår db
+            })
+        } finally {
+            whenDone();
+        }
+    })
+}
+
+//runQuery(getBoat)
+
+const getAllBoats = (col, whenDone) => {
+    console.log('FUNCTION IS  STARTING');
+    col.find().toArray((error, docs) => {// här skall vi välja via FrontEnd
+        try {
+            if( error ) {
+                console.log('Bad find query!', error.message);
+                return;
+            }
+            console.log('Found documents:');
+            docs.forEach(doc => {
+                console.log(`* ${doc.name}, ${doc.color}, ${doc.price} kr`);// här skriva om till vår db
+            })
+        } finally {
+            whenDone();
+        }
+    })
+}
+
+//runQuery(getAllBoats)
+
+const boatInsert = (col, whenDone) => {
+    col.insertMany(
+        [
+            { modelname: 'Båt 1', price: 20, color: 'black' },
+            { name: 'fedora', price: 400, color: 'blond' }
+        ],
+        (error, result) => {
+            try {
+                if( error ) {
+                    console.log('Bad insert query!', error.message);
+                    return;
+                }
+                console.log('Query successful, added hats.');
+                console.log(result);
+            } finally {
+                // client.close();
+                whenDone();
+            }
+        }
+    )
+}
+
+//runQuery(boatInsert)
+
+const boatUpdate = (col, whenDone) => {
+    //const filter = { _id: new ObjectID("5d62f9ac559322bc151c056c") };
+    const filter = { name: 'beret' };
+    const update = { $inc: { price: 5 } };
+    col.updateOne(filter, update, (error, result) => {
+        if( error ) {
+            console.log('Could not update that: ', error.message);
+        } else {
+            console.log('Its now updated: ', result.result);
+        }
+        whenDone();
+    })
+}
+//runQuery(boatUpdate)
+
+
+
+const boatDelete = (col, whenDone) => {
+    const filter = { _id: new ObjectID("")};
+    col.deleteOne(filter, (error, result) => {
+        if( error ) {
+            console.log('Could not remove that: ', error.message);
+        } else {
+            console.log('Removed that: ', result.result);
+        }
+        whenDone();
+    })
+}
+//runQuery(boatDelete)
+
+
+const deleteALL = (col, whenDone) => {
+    const filter = {};
+    col.deleteMany(filter, (error, result) => {
+        if( error ) {
+            console.log('Could not remove that: ', error.message);
+        } else {
+            console.log('Removed that: ', result.result);
+        }
+        whenDone();
+    })
+}
+//runQuery(deleteALL)
+

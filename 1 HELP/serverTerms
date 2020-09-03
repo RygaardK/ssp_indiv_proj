@@ -1,0 +1,50 @@
+
+
+
+
+db, show dbs, use dbname, show collections, db.name.count()
+Collection commands:
+.insert / insertOne / insertMany
+.find(filter)
+Filter kan utelämnas, för att hämta alla documents.
+.deleteOne(filter) / deleteMany()
+Lägg på .pretty() efter en query för att formatera resultatet.
+
+
+> use example        // Välja databasen example
+> show collections   // Visa alla collections som finns i example
+
+// CRUD
+> db.example.find()
+> db.example.find({ "name": "Exemplaria" })
+> db.example.insert({ "name": "Exemplaria" })
+> db.example.deleteOne({ "name": "Exemplaria" })
+> db.example.find().pretty()
+> db.example.updateOne({ "name": "Exemplaria" },
+    { $set: {"name": "Modified"} })
+
+db.rygaard.deleteOne({ "modelname": "Nimbus" })
+
+Lägga till ett dokument till collection "example"
+> db.example.insertOne({ "name": "Exemplaria" })
+Returnera (alla) dokument ur collection "example"
+> db.example.find()
+Ta bort ett dokument ur collection "example"
+> db.example.deleteOne({ "name": "Exemplaria" })
+Ändra dokumentet som har name=='Exemplaria'
+> db.example.updateOne({ "name": "Exemplaria" },
+    { $set: {"name": "Modified"} })
+
+
+
+
+    Ett filter är ett dokument (objekt) som beskriver vilka dokument som ska påverkas av en operation.
+{ name: "David" } ← matchar dokument som har name=David exakt
+{ name: /^Da/ } ← matchar dokument som har name=David, Daniel m.fl.
+Exempel på ett dokument som kan användas för att matcha de dokument som ska påverkas; de där egenskapen age har värdet age < 18 (LT = less than)
+Kan användas i alla queries:
+{ age: { $lt: 17 } }
+
+
+
+db.rygaard.insert({ "modelname": "Thundershild", "year": "2020", "price": 199000, "sail": false, "motor": true, "imgurl": "../assets/Thundershild.jpg" })

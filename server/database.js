@@ -1,4 +1,5 @@
 const { MongoClient, ObjectID } = require('mongodb');
+const { query } = require('express');
 
 const url = 'mongodb://localhost:27017';
 const dbName = 'rygaard';
@@ -8,13 +9,16 @@ console.log('About to connect to database...');
 
 
 function getAllBoats(callback) {
+    console.log('get ALL boat func');
 	get({}, callback)
 }
 
-
 function getBoat(id, callback) {
+    console.log('get boat func');
 	get({ _id: new ObjectID(id) }, array => callback( array[0] ))
 }
+
+
 
 function get(filter, callback) {
 	MongoClient.connect(
@@ -38,35 +42,54 @@ function get(filter, callback) {
 			} finally {
 				client.close();
 			}
+		}
+	)
+}
 
+function deleteBoat(id, callback) {
+	console.log('deleteBoat ID: ', id);
+	let filter = {_id: new ObjectID(id)}
+	MongoClient.connect(
+		url,
+		{ useUnifiedTopology: true },
+		async (error, client) => {
+			if( error ) {
+				('"ERROR!! Could not connect"');
+				return;  // exit the callback function
+			}
+			const col = client.db(dbName).collection(collectionName);
+			try {
+				// Wait for the rest of the query
+				// If it fails, it will throw an error
+				const result = await col.deleteOne(filter);
+				callback({
+					result: result.result,
+					ops: result.ops
+				})
 
-			// .toArray((error, docs) => {
-			// 	// console.log('find filter=', filter, error, docs);
-			// 	if( error ) {
-			// 		callback('"ERROR!! Query error"');
-			// 	} else {
-			// 		callback(docs);
-			// 	}
-			// 	client.close();
-			// })// toArray - async
+			} catch(error) {
+				console.error('DELETE BOAT error: ' + error.message);
+				callback('"ERROR!! Query error"');
+			} finally {
+				client.close();
+			}
 		}// connect callback - async
 	)//connect - async
 }
-
 function addBoat(requestBody, callback) {
-	// console.log('addHat', requestBody);
+	console.log('addBoat: ', requestBody);
 	const doc = requestBody
 	MongoClient.connect(
 		url,
 		{ useUnifiedTopology: true },
 		async (error, client) => {
 			if( error ) {
-				callback('"ERROR!! Could not connect"');
+				('"ERROR!! Could not connect"');
 				return;  // exit the callback function
 			}
 			const col = client.db(dbName).collection(collectionName);
 			try {
-				// Wait for the resut of the query
+				// Wait for the rest of the query
 				// If it fails, it will throw an error
 				const result = await col.insertOne(doc);
 				callback({
@@ -77,7 +100,6 @@ function addBoat(requestBody, callback) {
 			} catch(error) {
 				console.error('addBoat error: ' + error.message);
 				callback('"ERROR!! Query error"');
-
 			} finally {
 				client.close();
 			}
@@ -85,21 +107,61 @@ function addBoat(requestBody, callback) {
 	)//connect - async
 }
 
+//	http://localhost:3000/search/?word=nimbus&maxprice=30000
+function search(query, callback) {
+	console.log(query);
+	const filter = {};
+	if( query.word ) {
+		filter.modelname = { "$regex": new RegExp(`.*${query.word}.*`)};
+		//console.log(query.word,'WORD IS: ', filter.modelname);
+	}
+	if( query.maxprice ) {
+		filter.price = { "$lte": Number(query.maxprice)};
+		console.log(query.maxprice,'MAXPRICE IS: ', filter.price);
+	}
+	MongoClient.connect(
+		url,
+		{ useUnifiedTopology: true },
+		async (error, client) => {
+			if( error ) {
+				callback('"ERROR!! Could not connect"');
+				return;  // exit the callback function
+			}
+			const col = client.db(dbName).collection(collectionName);
+			console.log(filter);
+			try {
+				const cursor = await col.find(filter).limit(5);
+				const array = await cursor.toArray()
+				callback(array);
+
+			} catch(error) {
+				console.log('Query error: ' + error.message);
+				callback('"ERROR!! Query error"');
+
+			} finally {
+				client.close();
+			}
 
 
+		}// connect callback - async
+	)//connect - async
+}
 
 
 
 module.exports = {
-	getAllBoats, getBoat, addBoat
+	getAllBoats, getBoat, addBoat, search, deleteBoat
 }
+
+
+
 
 //runQuery(boatInsert)
 
 const boatUpdate = (col, whenDone) => {
-    //const filter = { _id: new ObjectID("5d62f9ac559322bc151c056c") };
-    const filter = { name: 'beret' };
-    const update = { $inc: { price: 5 } };
+    //const filter = { _id: new ObjectID("5f4d3a72377cc32a6c195c38nod") };
+    const filter = { name: 'Thundershild' };
+    const update = { $inc: { price: 5000 } };
     col.updateOne(filter, update, (error, result) => {
         if( error ) {
             console.log('Could not update that: ', error.message);

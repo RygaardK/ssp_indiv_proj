@@ -1,0 +1,17 @@
+      "_id" : ObjectId("5f44d03aadce33445ba388a9"),
+        "name" : "Kristoffer Rygaard",
+        "year" : "1988-02-02-5059",
+        "role" : "Admin"
+}
+{
+        "_id" : ObjectId("5f44d072adce33445ba388aa"),
+        "name" : "Lisa Andersson",
+        "year" : "1996-08-10-4808",
+        "role" : "Buttler"
+}
+{
+        "_id" : ObjectId("5f44fd86adce33445ba388ab"),
+        "name" : "Ninva Bahno",
+        "year" : "1992-12-29-4808",
+        "role" : "Wife"
+}

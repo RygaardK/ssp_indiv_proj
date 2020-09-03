@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const app = express();
 const port = 1337;
 
-const { getBoat, getAllBoats, addBoat } = require("./database.js");
+const { getBoat, getAllBoats, addBoat, search, deleteBoat } = require("./database.js");
 
 
 
@@ -27,32 +27,53 @@ app.get('/', (req, res) => {
 
 app.get('/search', (req, res) => {
     //skall hantera sök funktionen
-})
-
-
-app.get('/api/boat', (res, req) => {
-    getBoat(req.query.id, dataOrError => {
+    search(req.query, dataOrError => {
         res.send(dataOrError)
-        //ROUT SKALL KUNNA HANTERA 
     })
 })
 
-app.get('/api/boats', (res, req) => {
+
+app.get('/boat', (req, res) => {
+    let id = req.query.id;
+    console.log('We are TRY THIS GET BOAT: ', id);
+    
+    getBoat(id, dataOrError => {
+        //console.log(id);
+        res.send(dataOrError)
+        //Skall hämta en båt med utsatt /x
+    })
+})
+
+app.delete('/boat/:id', (req, res) => {
+    let id = req.params.id;
+    //console.log(req.params.id);
+    //console.log(req.path);
+    //let id = req.path;
+    console.log('We are TRY TO DELETE:', id);
+    
+    deleteBoat(id, dataOrError => {
+        //console.log(id);
+        res.send(dataOrError)
+        //Skall DELTE en båt med utsatt /x
+    })
+})
+
+app.get('/boats', (req, res) => {
     getAllBoats(dataOrError => {
         res.send(dataOrError)
-        //ROUT SKALL KUNNA HANTERA 
+        //Skall hämta alla båtar
     })
 })
 
 
-app.post('/api/boat?', (req, res) => {
-    addBoat(dataOrError => {
+
+app.post('/boat', (req, res) => {
+    requestBody = req.body;
+    addBoat(requestBody, dataOrError => {
         res.send(dataOrError);
+        //Skall skapa en båt
     })
 })
-
-
-
 
 
 
